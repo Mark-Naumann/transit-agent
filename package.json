@@ -1,0 +1,10 @@
+{
+  "name": "transit-agent",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "export": "node scripts/export-vapi.js",
+    "check": "node scripts/check-secrets.js"
+  },
+  "license": "UNLICENSED"
+}
