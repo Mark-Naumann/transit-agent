@@ -75,7 +75,7 @@ async function main() {
     log.forEach((entry) => (entry.file = entry.file || `vapi/${item.file}`));
 
     fs.writeFileSync(path.join(ROOT, 'vapi', item.file), JSON.stringify(clean, null, 2) + '\n');
-    console.log(`Saved vapi/${item.file}  (${item.type} "${clean.name || item.id}")`);
+    console.log(`Saved vapi/${item.file}  (${item.type} "${clean.name || (clean.function && clean.function.name) || item.id}")`);
 
     // Save the assistant's system prompt on its own, so it's easy to read on GitHub.
     if (item.type === 'assistant') {

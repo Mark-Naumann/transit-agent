@@ -1,0 +1,47 @@
+{
+  "id": "789054e2-14ea-409d-bcf4-cbd18b4cdd51",
+  "createdAt": "2026-11-18T21:07:09.417Z",
+  "updatedAt": "2026-11-18T21:08:21.398Z",
+  "type": "function",
+  "function": {
+    "name": "get_next_bus",
+    "description": "Get the next bus arrivals at a stop on a Juniper Valley Transit route, and where the bus is right now. Use whenever a caller asks when the next bus comes or says which stop they are waiting at.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "stop": {
+          "description": "Stop name or landmark the caller is at or heading to, e.g. \"library\", \"Railyard\", \"Santa Fe Place Mall\"",
+          "type": "string"
+        },
+        "route": {
+          "description": "Route number as a string: \"1\" Cerrillos, \"2\" Hospital Loop, \"3\" College, \"4\" Museum Hill",
+          "type": "string"
+        }
+      },
+      "required": [
+        "route",
+        "stop"
+      ]
+    }
+  },
+  "messages": [
+    {
+      "type": "request-start",
+      "blocking": false
+    }
+  ],
+  "orgId": "<ORG_ID>",
+  "server": {
+    "url": "https://transit-sim-sigma.vercel.app/api/vapi",
+    "timeoutSeconds": 20,
+    "staticIpAddressesEnabled": false
+  },
+  "variableExtractionPlan": {
+    "schema": {
+      "type": "object",
+      "required": [],
+      "properties": {}
+    }
+  },
+  "latestVersion": "v2"
+}

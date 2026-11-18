@@ -23,7 +23,8 @@ You call JVT. Jordan, a friendly dispatcher, can:
 - **Answer route, fare and hours questions** from a fixed set of facts only.
 - **Take a paratransit trip request:** rider ID, date (1–7 days ahead), pickup and
   drop-off, times, and mobility needs.
-- **Log lost items and complaints.**
+- **Log lost items** (held 30 days at Sheridan Transit Center) **and complaints**
+  (staff follow up within 2 business days).
 - Switch to **Spanish** if you speak Spanish.
 
 Afterwards, staff get an email with a 12-field "transit request" summary.
@@ -34,10 +35,12 @@ Afterwards, staff get an email with a 12-field "transit request" summary.
 |---|---|
 | "I need a paratransit ride **today**" | Explains there are no same-day trips and offers tomorrow. |
 | "Book my ride, is it confirmed?" | Never says confirmed. A scheduler calls back, like a real agency. |
-| "Someone collapsed on the bus!" | Tells the caller to **call 911 right away**, before anything else. No medical advice. |
-| Asks for a stop that isn't on that route | Lists the stops that *are* on the route. |
-| Calls after the last bus | Says when the first bus runs tomorrow (or Monday, since there's no Sunday service). |
-| Asks something not in the facts | Doesn't guess. |
+| "Someone collapsed on the bus!" | Tells the caller to **hang up and call 911** right away. No questions first, no medical advice. |
+| Asks for a stop that isn't on that route | Lists the stops that *are* on the route (answer from transit-sim). |
+| Asks for the next bus after service ends | Says when the first bus runs tomorrow, or Monday since there's no Sunday service (answer from transit-sim). |
+| Asks a route, fare or policy question not in the facts | Never makes it up. Takes a name and number so staff can call back. |
+| "Can I talk to a person?" | Takes a name and number; customer service calls back within 1 business day. |
+| Wrong number | Says so kindly and ends the call. |
 
 ## How it works
 

@@ -1,0 +1,81 @@
+{
+  "id": "983e4d25-722a-4748-9cc5-258fc82fe16c",
+  "orgId": "<ORG_ID>",
+  "name": "transit request",
+  "type": "ai",
+  "description": "What the rider called about (info, paratransit booking, lost item, complaint) and the details staff need to follow up.",
+  "schema": {
+    "type": "object",
+    "required": [
+      "summary",
+      "language",
+      "rider_name",
+      "return_trip",
+      "request_type",
+      "mobility_needs",
+      "pickup_address",
+      "trip_date_time",
+      "callback_number",
+      "dropoff_address",
+      "lost_item_details",
+      "paratransit_rider_id"
+    ],
+    "properties": {
+      "summary": {
+        "description": "One or two sentences in English: what the caller needed and any follow-up staff must do.",
+        "type": "string"
+      },
+      "language": {
+        "description": "Language the call was mostly held in: English or Spanish.",
+        "type": "string"
+      },
+      "rider_name": {
+        "description": "Caller's full name, or empty if not given.",
+        "type": "string"
+      },
+      "return_trip": {
+        "description": "Return trip pickup time, or 'none'.",
+        "type": "string"
+      },
+      "request_type": {
+        "description": "Main reason for the call. One of: info, paratransit_booking, lost_item, complaint, other.",
+        "type": "string"
+      },
+      "mobility_needs": {
+        "description": "Wheelchair, walker, service animal, personal care attendant or companion, or 'none'.",
+        "type": "string"
+      },
+      "pickup_address": {
+        "description": "Paratransit pickup address, or empty.",
+        "type": "string"
+      },
+      "trip_date_time": {
+        "description": "Requested trip date and pickup or appointment time, or empty.",
+        "type": "string"
+      },
+      "callback_number": {
+        "description": "Callback phone number the caller confirmed, digits only.",
+        "type": "string"
+      },
+      "dropoff_address": {
+        "description": "Paratransit drop-off address, or empty.",
+        "type": "string"
+      },
+      "lost_item_details": {
+        "description": "For lost items: what the item is, route number, date and approximate time. Otherwise empty.",
+        "type": "string"
+      },
+      "paratransit_rider_id": {
+        "description": "Paratransit rider ID number for bookings, or empty.",
+        "type": "string"
+      }
+    }
+  },
+  "assistantIds": [
+    "8c2b8d1a-60a0-44f8-998b-e65877dd0111"
+  ],
+  "workflowIds": [],
+  "createdAt": "2026-11-18T19:31:41.004Z",
+  "updatedAt": "2026-11-18T19:36:18.851Z",
+  "target": "messages"
+}

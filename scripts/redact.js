@@ -63,7 +63,8 @@ function redact(value, where, log, orgIds, insideHeaders = false) {
       if (key === 'orgId') {
         clean[key] = '<ORG_ID>';
         log.push({ where: path, rule: 'org ID' });
-      } else if (child !== null && child !== '' && (insideHeaders || SECRET_FIELD.test(key))) {
+      } else if (typeof child !== 'boolean' && typeof child !== 'number' && child !== null && child !== '' && (insideHeaders || SECRET_FIELD.test(key))) {
+        // (true/false and numbers are settings, not secrets, so they are kept)
         clean[key] = '<REDACTED>';
         log.push({ where: path, rule: insideHeaders ? 'request header' : 'key/credential field' });
       } else {
