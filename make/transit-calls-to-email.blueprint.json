@@ -1,0 +1,75 @@
+{
+  "name": "Vapi transit calls → email",
+  "flow": [
+    {
+      "id": 1,
+      "mapper": {},
+      "module": "gateway:CustomWebHook",
+      "version": 1,
+      "metadata": {
+        "designer": {
+          "x": 0,
+          "y": 0,
+          "name": "vapi transit calls"
+        }
+      },
+      "parameters": {
+        "hook": "<MAKE_WEBHOOK_ID>",
+        "maxResults": 1
+      }
+    },
+    {
+      "id": 2,
+      "filter": {
+        "name": "Only end-of-call reports",
+        "conditions": [
+          [
+            {
+              "a": "{{1.message.type}}",
+              "b": "end-of-call-report",
+              "o": "text:equal"
+            }
+          ]
+        ]
+      },
+      "mapper": {
+        "to": [
+          "<STAFF_EMAIL>"
+        ],
+        "content": "<h2>{{1.message.artifact.structuredOutputs.`983e4d25-722a-4748-9cc5-258fc82fe16c`.result.request_type}} call from {{1.message.artifact.structuredOutputs.`983e4d25-722a-4748-9cc5-258fc82fe16c`.result.rider_name}}</h2><p><b>Summary:</b> {{1.message.artifact.structuredOutputs.`983e4d25-722a-4748-9cc5-258fc82fe16c`.result.summary}}</p><p><b>Call back:</b> {{1.message.artifact.structuredOutputs.`983e4d25-722a-4748-9cc5-258fc82fe16c`.result.callback_number}}<br><b>Language:</b> {{1.message.artifact.structuredOutputs.`983e4d25-722a-4748-9cc5-258fc82fe16c`.result.language}}</p><h3>Paratransit trip</h3><p><b>Rider ID:</b> {{1.message.artifact.structuredOutputs.`983e4d25-722a-4748-9cc5-258fc82fe16c`.result.paratransit_rider_id}}<br><b>Pickup:</b> {{1.message.artifact.structuredOutputs.`983e4d25-722a-4748-9cc5-258fc82fe16c`.result.pickup_address}}<br><b>Drop-off:</b> {{1.message.artifact.structuredOutputs.`983e4d25-722a-4748-9cc5-258fc82fe16c`.result.dropoff_address}}<br><b>When:</b> {{1.message.artifact.structuredOutputs.`983e4d25-722a-4748-9cc5-258fc82fe16c`.result.trip_date_time}}<br><b>Return trip:</b> {{1.message.artifact.structuredOutputs.`983e4d25-722a-4748-9cc5-258fc82fe16c`.result.return_trip}}<br><b>Mobility needs:</b> {{1.message.artifact.structuredOutputs.`983e4d25-722a-4748-9cc5-258fc82fe16c`.result.mobility_needs}}</p><h3>Lost item</h3><p>{{1.message.artifact.structuredOutputs.`983e4d25-722a-4748-9cc5-258fc82fe16c`.result.lost_item_details}}</p><p><a href=\"{{1.message.recordingUrl}}\">Listen to the call recording</a></p>",
+        "subject": "Juniper Valley Transit: {{1.message.artifact.structuredOutputs.`983e4d25-722a-4748-9cc5-258fc82fe16c`.result.request_type}} - {{1.message.artifact.structuredOutputs.`983e4d25-722a-4748-9cc5-258fc82fe16c`.result.rider_name}}",
+        "bodyType": "rawHtml"
+      },
+      "module": "google-email:sendAnEmail",
+      "version": 4,
+      "metadata": {
+        "designer": {
+          "x": 300,
+          "y": 0,
+          "name": "Email the request"
+        }
+      },
+      "parameters": {
+        "__IMTCONN__": "<GMAIL_CONNECTION_ID>"
+      }
+    }
+  ],
+  "metadata": {
+    "instant": true,
+    "version": 1,
+    "scenario": {
+      "dlq": false,
+      "dataloss": false,
+      "maxErrors": 3,
+      "autoCommit": true,
+      "roundtrips": 1,
+      "sequential": false,
+      "confidential": false,
+      "freshVariables": false,
+      "autoCommitTriggerLast": true
+    }
+  },
+  "scheduling": {
+    "type": "immediately"
+  }
+}
