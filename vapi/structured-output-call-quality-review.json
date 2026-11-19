@@ -18,7 +18,7 @@
     ],
     "properties": {
       "accuracy": {
-        "description": "yes or no: did the agent avoid making up facts, prices, times or policies, and repeat names and phone numbers back correctly?",
+        "description": "yes or no: did the agent avoid making up facts, prices, times or policies, and repeat names and phone numbers back with the correct digits (10 digits, matching what the caller said)? The transcript may show numbers as numerals or with dashes; that is fine because callers hear it spoken. Only mark no for wrong, missing or extra digits, or made-up info.",
         "type": "string"
       },
       "issues_found": {
@@ -57,6 +57,6 @@
   ],
   "workflowIds": [],
   "createdAt": "2026-11-19T00:42:39.147Z",
-  "updatedAt": "2026-11-19T04:04:21.113Z",
+  "updatedAt": "2026-11-19T05:00:32.527Z",
   "target": "messages"
 }

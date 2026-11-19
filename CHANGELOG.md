@@ -32,7 +32,7 @@
 - New Vapi Transfer Call tool `transfer_to_person`: blind transfer to a staff phone line when the caller asks for a real person, supervisor or dispatcher ("Sure, connecting you now", no "why?" first). If the transfer fails, Jordan takes a name and number for a callback.
 - Remembers everything the caller already said on the call (where they are, where they're going, their name) and never asks again.
 - Never asks "which route?": `get_next_bus` gets the route only if the caller named one.
-- Phone numbers: read back once with every digit as a word, in groups of 3, 3 and 4; never as numerals or dashes; count exactly 10 digits first. This fixes a real bug the call quality review caught (an 11-digit read-back). The analyzer's own suggested fix had an error too, so the fix was rewritten by hand.
+- Phone numbers: read back once with every digit as a word, in groups of 3, 3 and 4; never as numerals or dashes; count exactly 10 digits first. This fixes a real bug the call quality review caught (an 11-digit read-back). The analyzer's own suggested fix had an error too (its example number had 11 digits), so the fix was rewritten by hand.
 - "Call quality review" structured output attached; Make sends a review email after every call.
 - `get_next_bus` tool is at v4 (server: transit-sim `/api/vapi`).
 
