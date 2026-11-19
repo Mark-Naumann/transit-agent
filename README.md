@@ -18,8 +18,15 @@ clean 12-field summary.**
 You call JVT. Jordan, a friendly dispatcher, can:
 
 - **Tell you when the next bus is coming, live.** "I'm at the Main Library, when's the
-  next Route 2?" Jordan looks it up mid-call: *"The next Route 2 bus reaches Main Library
-  in 13 minutes, then another in 43. It's currently near St. Michael's and Llano."*
+  next bus?" Jordan looks it up mid-call (no route number needed): *"The next Route 2 bus
+  reaches Main Library in 9 minutes, then another in 39."* If you ask, Jordan also says
+  where that bus is right now.
+- **Plan a trip.** "How do I get from the mall to the hospital?" Jordan finds a direct
+  bus or one transfer at Sheridan Transit Center, using live times: *"Take Route 1 from
+  Santa Fe Place Mall to Sheridan Transit Center, then transfer to Route 2 to Christus
+  St. Vincent hospital. Next bus leaves in 13 minutes, about 1 hour 2 minutes total."*
+  Landmarks work too: ask for Meow Wolf or the Folk Art Museum and Jordan names the
+  closest stop.
 - **Answer route, fare and hours questions** from a fixed set of facts only.
 - **Take a paratransit trip request:** rider ID, date (1–7 days ahead), pickup and
   drop-off, times, and mobility needs.
@@ -52,11 +59,12 @@ Vapi voice agent "Jordan"
   ├─ Soniox speech-to-text (English + Spanish)
   ├─ GPT-4.1 (system prompt + agency facts → what to say)
   │     │
-  │     │  "when's the next bus?"
+  │     │  "when's the next bus?" / "how do I get to…?"
   │     ▼
-  │   get_next_bus(route, stop) tool ──► transit-sim API (/api/vapi) ──► live answer
+  │   get_next_bus(stop, route?) ─┐
+  │   plan_trip(from, to) ────────┴─► transit-sim API (/api/vapi) ──► live answer
   │
-  └─ Vapi voice "Savannah" (text-to-speech, office background sound)
+  └─ Vapi voice "Kai" (text-to-speech, quiet office background audio from transit-sim)
   │
   │  end of call → structured output ("transit request", 12 fields)
   ▼
@@ -74,7 +82,9 @@ agency's GTFS-realtime feed can replace the simulation later without changing Jo
 |---|---|
 | [`prompt.md`](prompt.md) | Jordan's full system prompt (easy to read) |
 | `vapi/assistant-jordan.json` | The Vapi assistant config (model, voice, transcriber, settings) |
-| `vapi/tool-get-next-bus.json` | The `get_next_bus` function tool definition |
+| `vapi/tool-get-next-bus.json` | The `get_next_bus` function tool definition (route optional) |
+| `vapi/tool-plan-trip.json` | The `plan_trip` function tool definition |
+| `scripts/update-vapi-tools.js` | Updates the tools and Jordan in Vapi from code (dry run by default) |
 | `vapi/structured-output-transit-request.json` | The 12 fields extracted at the end of each call |
 | `make/` | The Make scenario blueprint ("Vapi transit calls → email") |
 | `scripts/export-vapi.js` | Downloads the configs from the Vapi API and **redacts** private info |
@@ -105,6 +115,8 @@ See [`CHANGELOG.md`](CHANGELOG.md). Highlights:
 - **v3:** initial build: facts-only answers, paratransit requests, lost items, complaints, 911 rule, English + Spanish, 12-field summary.
 - **v4:** friendlier voice (Vapi "Savannah"); routes rebuilt on real Santa Fe streets.
 - **v5:** live next-bus lookup via the `get_next_bus` tool → transit-sim.
+- **v6–v7:** voice "Kai", one question per turn, careful phone-number read-back, custom vocabulary for Santa Fe names.
+- **v8:** trip planning (`plan_trip`) and next-bus lookups without a route number.
 
 ## What I'd improve next
 

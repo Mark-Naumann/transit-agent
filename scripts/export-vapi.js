@@ -21,6 +21,7 @@ const { redact, findOrgIds } = require('./redact');
 const ITEMS = [
   { type: 'assistant', id: '8c2b8d1a-60a0-44f8-998b-e65877dd0111', file: 'assistant-jordan.json' },
   { type: 'tool', id: '789054e2-14ea-409d-bcf4-cbd18b4cdd51', file: 'tool-get-next-bus.json' },
+  { type: 'tool', id: '0b040c3f-3935-40b1-abdc-55106fe6fb03', file: 'tool-plan-trip.json' },
   { type: 'structured-output', id: '983e4d25-722a-4748-9cc5-258fc82fe16c', file: 'structured-output-transit-request.json' },
 ];
 // ----------------------------------------------------------------------------

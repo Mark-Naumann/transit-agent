@@ -15,6 +15,19 @@
 - New Vapi function tool `get_next_bus(route, stop)` → transit-sim `/api/vapi`.
 - When a caller asks "when's the next bus?" or says where they're waiting, Jordan calls the tool mid-call and reads back live arrival times and where the bus is now.
 
+**v6–v7: clearer conversations (Nov 18, Vapi dashboard)**
+- Voice switched to Vapi "Kai" at speed 1.1; background sound is transit-sim's quiet office audio (`/audio/office-quiet.mp3`).
+- Exactly one question per turn; never combines questions or answers its own.
+- Phone numbers: must be 10 digits; asks only for the missing part; reads back once in 3-3-4 groups.
+- Says "Cerrillos" as "Sir-EE-yos"; custom transcriber vocabulary for local names (Cerrillos, Llano, Christus St. Vincent…); smart endpointing.
+- Bus location is only mentioned if the caller asks; simple questions end without a recap.
+
+**v8: trip planning + no route number needed (Nov 19)**
+- `get_next_bus`: `route` is now optional. With only a stop, transit-sim checks every route that serves it.
+- New Vapi function tool `plan_trip(from, to)` → transit-sim `/api/vapi`: best trip using live times, direct or with one transfer at Sheridan Transit Center ("Take Route 1 … then transfer to Route 2 … Next bus leaves in 13 minutes, about 1 hour 2 minutes total").
+- Landmarks that aren't stops (Meow Wolf, the Folk Art Museum…) get the closest stop.
+- Changes made from code with `scripts/update-vapi-tools.js` (dry run first, then `--apply`).
+
 ## Automated tests (Vapi Evals, AI-judged). All passed Nov 18.
 
 | Test | Agent | Pass rule | Fail rule |

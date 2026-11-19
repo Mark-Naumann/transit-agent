@@ -1,0 +1,39 @@
+{
+  "id": "0b040c3f-3935-40b1-abdc-55106fe6fb03",
+  "createdAt": "2026-11-19T00:44:44.916Z",
+  "updatedAt": "2026-11-19T00:44:44.916Z",
+  "type": "function",
+  "function": {
+    "name": "plan_trip",
+    "description": "Plan a Juniper Valley Transit bus trip between two stops or landmarks, using live times. Finds a direct bus or one transfer at Sheridan Transit Center, and says when the next bus leaves and how long the trip takes. Use when a caller asks how to get from one place to another.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "to": {
+          "description": "Where the caller wants to go: a stop or landmark, e.g. \"Christus St. Vincent hospital\", \"the Plaza\"",
+          "type": "string"
+        },
+        "from": {
+          "description": "Where the caller is starting: a stop or landmark, e.g. \"Santa Fe Place Mall\", \"the library\", \"Meow Wolf\"",
+          "type": "string"
+        }
+      },
+      "required": [
+        "from",
+        "to"
+      ]
+    }
+  },
+  "messages": [
+    {
+      "type": "request-start",
+      "blocking": false
+    }
+  ],
+  "orgId": "<ORG_ID>",
+  "server": {
+    "url": "https://transit-sim-sigma.vercel.app/api/vapi",
+    "timeoutSeconds": 20
+  },
+  "latestVersion": "v1"
+}
