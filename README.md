@@ -6,7 +6,7 @@ clean 12-field summary.**
 
 🎬 **Demo video:** coming soon
 
-**Current version:** Jordan **v10** on Vapi (Nov 19, 2026) · tools: `get_next_bus` (v4), `plan_trip`, `transfer_to_person` · **Call review:** every call is graded automatically ([call-analyzer](https://github.com/Mark-Naumann/call-analyzer))
+**Current version:** Jordan **v10** on Vapi (Nov 18, 2026, Mountain Time) · tools: `get_next_bus` (v4), `plan_trip`, `transfer_to_person` · **Call review:** every call is graded automatically ([call-analyzer](https://github.com/Mark-Naumann/call-analyzer))
 🚌 **Live bus map Jordan reads from:** https://transit-sim-sigma.vercel.app
 
 > **Demo only.** Juniper Valley Transit (JVT) is a **fictional** agency. Its routes use
@@ -112,7 +112,7 @@ the transfer tool dials becomes `<TRANSFER_PHONE>` wherever it appears.
 
 **Known Vapi issue:** publishing from the assistant editor can silently detach the
 structured outputs. After every publish I re-attach them and check the next review email
-isn't blank ([incident write-up](https://github.com/Mark-Naumann/call-analyzer)).
+isn't blank ([incident write-up](https://github.com/Mark-Naumann/call-analyzer/blob/main/examples/03-incident-review-silently-detached.md)).
 
 ## Testing
 

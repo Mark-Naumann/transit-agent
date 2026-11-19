@@ -22,13 +22,13 @@
 - Says "Cerrillos" as "Sir-EE-yos"; custom transcriber vocabulary for local names (Cerrillos, Llano, Christus St. Vincent…); smart endpointing.
 - Bus location is only mentioned if the caller asks; simple questions end without a recap.
 
-**v8: trip planning + no route number needed (Nov 19)**
+**v8: trip planning + no route number needed (Nov 18)**
 - `get_next_bus`: `route` is now optional. With only a stop, transit-sim checks every route that serves it.
 - New Vapi function tool `plan_trip(from, to)` → transit-sim `/api/vapi`: best trip using live times, direct or with one transfer at Sheridan Transit Center ("Take Route 1 … then transfer to Route 2 … Next bus leaves in 13 minutes, about 1 hour 2 minutes total").
 - Landmarks that aren't stops (Meow Wolf, the Folk Art Museum…) get the closest stop.
 - Changes made from code with `scripts/update-vapi-tools.js` (dry run first, then `--apply`).
 
-**v9–v10: transfer to a person, memory, phone-number fix (Nov 19, Vapi dashboard)**
+**v9–v10: transfer to a person, memory, phone-number fix (Nov 18, Vapi dashboard)**
 - New Vapi Transfer Call tool `transfer_to_person`: blind transfer to a staff phone line when the caller asks for a real person, supervisor or dispatcher ("Sure, connecting you now", no "why?" first). If the transfer fails, Jordan takes a name and number for a callback.
 - Remembers everything the caller already said on the call (where they are, where they're going, their name) and never asks again.
 - Never asks "which route?": `get_next_bus` gets the route only if the caller named one.
@@ -36,7 +36,7 @@
 - "Call quality review" structured output attached; Make sends a review email after every call.
 - `get_next_bus` tool is at v4 (server: transit-sim `/api/vapi`).
 
-**Known Vapi issue (Nov 19):** publishing from the assistant editor silently detaches structured outputs that were attached from the structured output's own page. Caught by a blank review email; workaround: re-attach after each publish.
+**Known Vapi issue (Nov 18):** publishing from the assistant editor silently detaches structured outputs that were attached from the structured output's own page. Caught by a blank review email; workaround: re-attach after each publish.
 
 ## Automated tests (Vapi Evals, AI-judged). All passed Nov 18.
 
