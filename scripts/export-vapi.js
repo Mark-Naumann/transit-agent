@@ -15,14 +15,16 @@
 
 const fs = require('fs');
 const path = require('path');
-const { redact, findOrgIds } = require('./redact');
+const { redact, findOrgIds, findTransferNumbers } = require('./redact');
 
 // ---- What to export for THIS project ---------------------------------------
 const ITEMS = [
   { type: 'assistant', id: '8c2b8d1a-60a0-44f8-998b-e65877dd0111', file: 'assistant-jordan.json' },
   { type: 'tool', id: '789054e2-14ea-409d-bcf4-cbd18b4cdd51', file: 'tool-get-next-bus.json' },
   { type: 'tool', id: '0b040c3f-3935-40b1-abdc-55106fe6fb03', file: 'tool-plan-trip.json' },
+  { type: 'tool', id: 'ae465176-f84c-4945-b3fa-dffbf9e1742f', file: 'tool-transfer-to-person.json' },
   { type: 'structured-output', id: '983e4d25-722a-4748-9cc5-258fc82fe16c', file: 'structured-output-transit-request.json' },
+  { type: 'structured-output', id: 'c80a84f4-ead7-4c67-8da8-c951c2474816', file: 'structured-output-call-quality-review.json' },
 ];
 // ----------------------------------------------------------------------------
 
@@ -69,10 +71,22 @@ async function main() {
   fs.mkdirSync(path.join(ROOT, 'vapi'), { recursive: true });
   const log = [];
 
-  for (const item of ITEMS) {
-    const raw = await fetchFromVapi(item.type, item.id, apiKey);
-    const orgIds = findOrgIds(raw);
-    const clean = redact(raw, "", log, orgIds);
+  // 1. Download everything first (GET requests only).
+  const downloads = [];
+  for (const item of ITEMS) downloads.push({ item, raw: await fetchFromVapi(item.type, item.id, apiKey) });
+
+  // 2. Collect what to hide from ALL items, so e.g. the transfer tool's phone
+  //    number is also hidden if it appears in the assistant's prompt.
+  const orgIds = new Set();
+  const transferDigits = new Set();
+  for (const { raw } of downloads) {
+    findOrgIds(raw, orgIds);
+    findTransferNumbers(raw, transferDigits);
+  }
+
+  // 3. Redact and save each item.
+  for (const { item, raw } of downloads) {
+    const clean = redact(raw, '', log, orgIds, false, transferDigits);
     log.forEach((entry) => (entry.file = entry.file || `vapi/${item.file}`));
 
     fs.writeFileSync(path.join(ROOT, 'vapi', item.file), JSON.stringify(clean, null, 2) + '\n');

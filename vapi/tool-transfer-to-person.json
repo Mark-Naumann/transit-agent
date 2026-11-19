@@ -1,0 +1,31 @@
+{
+  "id": "ae465176-f84c-4945-b3fa-dffbf9e1742f",
+  "createdAt": "2026-11-19T03:48:44.638Z",
+  "updatedAt": "2026-11-19T03:49:49.149Z",
+  "type": "transferCall",
+  "function": {
+    "name": "transfer_to_person",
+    "description": "Transfer the caller to a real person at Juniper Valley Transit when they ask for a person, supervisor, or dispatcher."
+  },
+  "messages": [
+    {
+      "type": "request-start",
+      "blocking": false
+    }
+  ],
+  "orgId": "<ORG_ID>",
+  "destinations": [
+    {
+      "type": "number",
+      "number": "<TRANSFER_PHONE>",
+      "message": "Sure thing, connecting you with a person now. One moment.",
+      "description": "Juniper Valley Transit staff member. Use when the caller asks for a real person, supervisor, or dispatcher.",
+      "transferPlan": {
+        "mode": "blind-transfer",
+        "sipVerb": "refer"
+      },
+      "numberE164CheckEnabled": true
+    }
+  ],
+  "latestVersion": "v2"
+}

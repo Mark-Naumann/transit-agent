@@ -1,7 +1,7 @@
 {
   "id": "789054e2-14ea-409d-bcf4-cbd18b4cdd51",
   "createdAt": "2026-11-18T21:07:09.417Z",
-  "updatedAt": "2026-11-19T00:44:44.418Z",
+  "updatedAt": "2026-11-19T00:49:56.903Z",
   "type": "function",
   "function": {
     "name": "get_next_bus",
@@ -30,6 +30,11 @@
     }
   ],
   "orgId": "<ORG_ID>",
+  "server": {
+    "url": "https://transit-sim-sigma.vercel.app/api/vapi",
+    "timeoutSeconds": 20,
+    "staticIpAddressesEnabled": false
+  },
   "variableExtractionPlan": {
     "schema": {
       "type": "object",
@@ -37,5 +42,5 @@
       "properties": {}
     }
   },
-  "latestVersion": "v3"
+  "latestVersion": "v4"
 }

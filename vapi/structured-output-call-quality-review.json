@@ -1,0 +1,62 @@
+{
+  "id": "c80a84f4-ead7-4c67-8da8-c951c2474816",
+  "orgId": "<ORG_ID>",
+  "name": "call quality review",
+  "type": "ai",
+  "description": "QA review of how the AI agent handled the call: a score, rule checks, problems found, and one suggested prompt fix.",
+  "schema": {
+    "type": "object",
+    "required": [
+      "accuracy",
+      "issues_found",
+      "overall_score",
+      "caller_goal_met",
+      "caller_sentiment",
+      "remembered_context",
+      "suggested_prompt_fix",
+      "one_question_per_turn"
+    ],
+    "properties": {
+      "accuracy": {
+        "description": "yes or no: did the agent avoid making up facts, prices, times or policies, and repeat names and phone numbers back correctly?",
+        "type": "string"
+      },
+      "issues_found": {
+        "description": "Short list of the agent's specific mistakes, each with a short quote from the transcript. Write 'none' if the call was clean.",
+        "type": "string"
+      },
+      "overall_score": {
+        "description": "Score from 1 to 10 for how well the AI agent handled this call. 10 means it handled it as well as a great human rep would.",
+        "type": "string"
+      },
+      "caller_goal_met": {
+        "description": "yes or no: did the caller get what they called for (an answer, a booking, their info taken, or a correct referral)?",
+        "type": "string"
+      },
+      "caller_sentiment": {
+        "description": "How the caller seemed by the end of the call: happy, neutral, or frustrated.",
+        "type": "string"
+      },
+      "remembered_context": {
+        "description": "yes or no: did the agent use what the caller already said instead of asking for it again?",
+        "type": "string"
+      },
+      "suggested_prompt_fix": {
+        "description": "One specific rule to add or change in the agent's system prompt that would prevent the biggest issue, written so it can be pasted into the prompt. Write 'none' if no change is needed.",
+        "type": "string"
+      },
+      "one_question_per_turn": {
+        "description": "yes or no: did the agent ask only one question per turn and never answer its own question?",
+        "type": "string"
+      }
+    }
+  },
+  "assistantIds": [
+    "bfcee653-30d7-4581-9a9b-dee7f5dd07ce",
+    "8c2b8d1a-60a0-44f8-998b-e65877dd0111"
+  ],
+  "workflowIds": [],
+  "createdAt": "2026-11-19T00:42:39.147Z",
+  "updatedAt": "2026-11-19T04:04:21.113Z",
+  "target": "messages"
+}

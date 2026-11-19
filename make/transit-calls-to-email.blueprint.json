@@ -3,9 +3,9 @@
   "flow": [
     {
       "id": 1,
-      "mapper": {},
       "module": "gateway:CustomWebHook",
       "version": 1,
+      "mapper": {},
       "metadata": {
         "designer": {
           "x": 0,
@@ -32,14 +32,6 @@
           ]
         ]
       },
-      "mapper": {
-        "to": [
-          "<STAFF_EMAIL>"
-        ],
-        "content": "<h2>{{1.message.artifact.structuredOutputs.`983e4d25-722a-4748-9cc5-258fc82fe16c`.result.request_type}} call from {{1.message.artifact.structuredOutputs.`983e4d25-722a-4748-9cc5-258fc82fe16c`.result.rider_name}}</h2><p><b>Summary:</b> {{1.message.artifact.structuredOutputs.`983e4d25-722a-4748-9cc5-258fc82fe16c`.result.summary}}</p><p><b>Call back:</b> {{1.message.artifact.structuredOutputs.`983e4d25-722a-4748-9cc5-258fc82fe16c`.result.callback_number}}<br><b>Language:</b> {{1.message.artifact.structuredOutputs.`983e4d25-722a-4748-9cc5-258fc82fe16c`.result.language}}</p><h3>Paratransit trip</h3><p><b>Rider ID:</b> {{1.message.artifact.structuredOutputs.`983e4d25-722a-4748-9cc5-258fc82fe16c`.result.paratransit_rider_id}}<br><b>Pickup:</b> {{1.message.artifact.structuredOutputs.`983e4d25-722a-4748-9cc5-258fc82fe16c`.result.pickup_address}}<br><b>Drop-off:</b> {{1.message.artifact.structuredOutputs.`983e4d25-722a-4748-9cc5-258fc82fe16c`.result.dropoff_address}}<br><b>When:</b> {{1.message.artifact.structuredOutputs.`983e4d25-722a-4748-9cc5-258fc82fe16c`.result.trip_date_time}}<br><b>Return trip:</b> {{1.message.artifact.structuredOutputs.`983e4d25-722a-4748-9cc5-258fc82fe16c`.result.return_trip}}<br><b>Mobility needs:</b> {{1.message.artifact.structuredOutputs.`983e4d25-722a-4748-9cc5-258fc82fe16c`.result.mobility_needs}}</p><h3>Lost item</h3><p>{{1.message.artifact.structuredOutputs.`983e4d25-722a-4748-9cc5-258fc82fe16c`.result.lost_item_details}}</p><p><a href=\"{{1.message.recordingUrl}}\">Listen to the call recording</a></p>",
-        "subject": "Juniper Valley Transit: {{1.message.artifact.structuredOutputs.`983e4d25-722a-4748-9cc5-258fc82fe16c`.result.request_type}} - {{1.message.artifact.structuredOutputs.`983e4d25-722a-4748-9cc5-258fc82fe16c`.result.rider_name}}",
-        "bodyType": "rawHtml"
-      },
       "module": "google-email:sendAnEmail",
       "version": 4,
       "metadata": {
@@ -51,6 +43,49 @@
       },
       "parameters": {
         "__IMTCONN__": "<GMAIL_CONNECTION_ID>"
+      },
+      "mapper": {
+        "to": [
+          "<STAFF_EMAIL>"
+        ],
+        "subject": "Juniper Valley Transit: {{1.message.artifact.structuredOutputs.`<TRANSIT_REQUEST_OUTPUT_ID>`.result.request_type}} - {{1.message.artifact.structuredOutputs.`<TRANSIT_REQUEST_OUTPUT_ID>`.result.rider_name}}",
+        "bodyType": "rawHtml",
+        "content": "<h2>{{1.message.artifact.structuredOutputs.`<TRANSIT_REQUEST_OUTPUT_ID>`.result.request_type}} call from {{1.message.artifact.structuredOutputs.`<TRANSIT_REQUEST_OUTPUT_ID>`.result.rider_name}}</h2><p><b>Summary:</b> {{1.message.artifact.structuredOutputs.`<TRANSIT_REQUEST_OUTPUT_ID>`.result.summary}}</p><p><b>Call back:</b> {{1.message.artifact.structuredOutputs.`<TRANSIT_REQUEST_OUTPUT_ID>`.result.callback_number}}<br><b>Language:</b> {{1.message.artifact.structuredOutputs.`<TRANSIT_REQUEST_OUTPUT_ID>`.result.language}}</p><h3>Paratransit trip</h3><p><b>Rider ID:</b> {{1.message.artifact.structuredOutputs.`<TRANSIT_REQUEST_OUTPUT_ID>`.result.paratransit_rider_id}}<br><b>Pickup:</b> {{1.message.artifact.structuredOutputs.`<TRANSIT_REQUEST_OUTPUT_ID>`.result.pickup_address}}<br><b>Drop-off:</b> {{1.message.artifact.structuredOutputs.`<TRANSIT_REQUEST_OUTPUT_ID>`.result.dropoff_address}}<br><b>When:</b> {{1.message.artifact.structuredOutputs.`<TRANSIT_REQUEST_OUTPUT_ID>`.result.trip_date_time}}<br><b>Return trip:</b> {{1.message.artifact.structuredOutputs.`<TRANSIT_REQUEST_OUTPUT_ID>`.result.return_trip}}<br><b>Mobility needs:</b> {{1.message.artifact.structuredOutputs.`<TRANSIT_REQUEST_OUTPUT_ID>`.result.mobility_needs}}</p><h3>Lost item</h3><p>{{1.message.artifact.structuredOutputs.`<TRANSIT_REQUEST_OUTPUT_ID>`.result.lost_item_details}}</p><p><a href=\"{{1.message.recordingUrl}}\">Listen to the call recording</a></p>"
+      }
+    },
+    {
+      "id": 3,
+      "filter": {
+        "name": "Only end-of-call reports",
+        "conditions": [
+          [
+            {
+              "a": "{{1.message.type}}",
+              "b": "end-of-call-report",
+              "o": "text:equal"
+            }
+          ]
+        ]
+      },
+      "module": "google-email:sendAnEmail",
+      "version": 4,
+      "metadata": {
+        "designer": {
+          "x": 600,
+          "y": 0,
+          "name": "Email the call review"
+        }
+      },
+      "parameters": {
+        "__IMTCONN__": "<GMAIL_CONNECTION_ID>"
+      },
+      "mapper": {
+        "to": [
+          "<OWNER_EMAIL>"
+        ],
+        "subject": "Call review: Jordan {{1.message.artifact.structuredOutputs.`<QUALITY_REVIEW_OUTPUT_ID>`.result.overall_score}}/10",
+        "bodyType": "rawHtml",
+        "content": "<h2>Call review: Jordan scored {{1.message.artifact.structuredOutputs.`<QUALITY_REVIEW_OUTPUT_ID>`.result.overall_score}}/10</h2><p><b>Caller goal met:</b> {{1.message.artifact.structuredOutputs.`<QUALITY_REVIEW_OUTPUT_ID>`.result.caller_goal_met}}<br><b>One question per turn:</b> {{1.message.artifact.structuredOutputs.`<QUALITY_REVIEW_OUTPUT_ID>`.result.one_question_per_turn}}<br><b>Remembered what caller said:</b> {{1.message.artifact.structuredOutputs.`<QUALITY_REVIEW_OUTPUT_ID>`.result.remembered_context}}<br><b>Accurate (no made-up info, numbers right):</b> {{1.message.artifact.structuredOutputs.`<QUALITY_REVIEW_OUTPUT_ID>`.result.accuracy}}<br><b>Caller sentiment:</b> {{1.message.artifact.structuredOutputs.`<QUALITY_REVIEW_OUTPUT_ID>`.result.caller_sentiment}}</p><h3>Issues found</h3><p>{{1.message.artifact.structuredOutputs.`<QUALITY_REVIEW_OUTPUT_ID>`.result.issues_found}}</p><h3>Suggested prompt fix</h3><p style=\"background:#f3f3f3;padding:8px\">{{1.message.artifact.structuredOutputs.`<QUALITY_REVIEW_OUTPUT_ID>`.result.suggested_prompt_fix}}</p><p><i>Review this before changing the prompt. The analyzer only suggests fixes.</i></p><p><a href=\"{{1.message.recordingUrl}}\">Listen to the call</a></p>"
       }
     }
   ],
@@ -68,8 +103,5 @@
       "freshVariables": false,
       "autoCommitTriggerLast": true
     }
-  },
-  "scheduling": {
-    "type": "immediately"
   }
 }

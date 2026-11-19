@@ -4,7 +4,9 @@
 trip requests, lost items and complaints, in English or Spanish, then hands staff a
 clean 12-field summary.**
 
-🎬 **Demo video:** _[link coming soon](#)_
+🎬 **Demo video:** coming soon
+
+**Current version:** Jordan **v10** on Vapi (Nov 19, 2026) · tools: `get_next_bus` (v4), `plan_trip`, `transfer_to_person` · **Call review:** every call is graded automatically ([call-analyzer](https://github.com/Mark-Naumann/call-analyzer))
 🚌 **Live bus map Jordan reads from:** https://transit-sim-sigma.vercel.app
 
 > **Demo only.** Juniper Valley Transit (JVT) is a **fictional** agency. Its routes use
@@ -18,7 +20,7 @@ clean 12-field summary.**
 You call JVT. Jordan, a friendly dispatcher, can:
 
 - **Tell you when the next bus is coming, live.** "I'm at the Main Library, when's the
-  next bus?" Jordan looks it up mid-call (no route number needed): *"The next Route 2 bus
+  next bus?" Jordan looks it up mid-call and **never asks "which route?"**: *"The next Route 2 bus
   reaches Main Library in 9 minutes, then another in 39."* If you ask, Jordan also says
   where that bus is right now.
 - **Plan a trip.** "How do I get from the mall to the hospital?" Jordan finds a direct
@@ -26,7 +28,10 @@ You call JVT. Jordan, a friendly dispatcher, can:
   Santa Fe Place Mall to Sheridan Transit Center, then transfer to Route 2 to Christus
   St. Vincent hospital. Next bus leaves in 13 minutes, about 1 hour 2 minutes total."*
   Landmarks work too: ask for Meow Wolf or the Folk Art Museum and Jordan names the
-  closest stop.
+  closest stop. Jordan **remembers what you already said**: if you mentioned you're at the
+  mall, a trip question starts from the mall without asking again.
+- **Connect you to a person** the moment you ask for one (a real person, a supervisor or
+  a dispatcher), with no "why?" first.
 - **Answer route, fare and hours questions** from a fixed set of facts only.
 - **Take a paratransit trip request:** rider ID, date (1–7 days ahead), pickup and
   drop-off, times, and mobility needs.
@@ -34,7 +39,9 @@ You call JVT. Jordan, a friendly dispatcher, can:
   (staff follow up within 2 business days).
 - Switch to **Spanish** if you speak Spanish.
 
-Afterwards, staff get an email with a 12-field "transit request" summary.
+Afterwards, staff get an email with a 12-field "transit request" summary, and a second
+email with an AI **call review**: a score out of 10, rule checks, issues found and one
+suggested prompt fix, which a person reviews before anything changes.
 
 ### The tough calls Jordan handles
 
@@ -46,7 +53,8 @@ Afterwards, staff get an email with a 12-field "transit request" summary.
 | Asks for a stop that isn't on that route | Lists the stops that *are* on the route (answer from transit-sim). |
 | Asks for the next bus after service ends | Says when the first bus runs tomorrow, or Monday since there's no Sunday service (answer from transit-sim). |
 | Asks a route, fare or policy question not in the facts | Never makes it up. Takes a name and number so staff can call back. |
-| "Can I talk to a person?" | Takes a name and number; customer service calls back within 1 business day. |
+| "Can I talk to a person?" | Says "Sure, connecting you now" and transfers right away (blind transfer to a staff line). If the transfer fails: takes a name and number for a callback within 1 business day. |
+| Gives a phone number | Needs exactly 10 digits; reads it back once as words, in 3-3-4 groups ("five oh five, …"), never as numerals. |
 | Wrong number | Says so kindly and ends the call. |
 
 ## How it works
@@ -63,12 +71,16 @@ Vapi voice agent "Jordan"
   │     ▼
   │   get_next_bus(stop, route?) ─┐
   │   plan_trip(from, to) ────────┴─► transit-sim API (/api/vapi) ──► live answer
+  │   transfer_to_person ───────────► blind transfer to a staff phone line
   │
   └─ Vapi voice "Kai" (text-to-speech, quiet office background audio from transit-sim)
   │
-  │  end of call → structured output ("transit request", 12 fields)
+  │  end of call → 2 structured outputs:
+  │     "transit request" (12 fields)
+  │     "call quality review" (score, rule checks, issues, suggested fix)
   ▼
-End-of-call report ──► Make webhook ──► email to staff
+End-of-call report ──► Make webhook ──┬─► email 1: the request, to staff
+                                      └─► email 2: the call review, to the owner
 ```
 
 **The live data:** [`transit-sim`](https://transit-sim-sigma.vercel.app) is my separate
@@ -84,15 +96,23 @@ agency's GTFS-realtime feed can replace the simulation later without changing Jo
 | `vapi/assistant-jordan.json` | The Vapi assistant config (model, voice, transcriber, settings) |
 | `vapi/tool-get-next-bus.json` | The `get_next_bus` function tool definition (route optional) |
 | `vapi/tool-plan-trip.json` | The `plan_trip` function tool definition |
-| `scripts/update-vapi-tools.js` | Updates the tools and Jordan in Vapi from code (dry run by default) |
+| `vapi/tool-transfer-to-person.json` | The Transfer Call tool (staff number redacted as `<TRANSFER_PHONE>`) |
 | `vapi/structured-output-transit-request.json` | The 12 fields extracted at the end of each call |
-| `make/` | The Make scenario blueprint ("Vapi transit calls → email") |
-| `scripts/export-vapi.js` | Downloads the configs from the Vapi API and **redacts** private info |
+| `vapi/structured-output-call-quality-review.json` | The AI call review (score, checks, issues, suggested fix) |
+| `make/` | The Make scenario blueprint, 3 modules: webhook → request email → call review email |
+| `scripts/export-vapi.js` | Downloads the configs from the Vapi API (read-only) and **redacts** private info |
+| `scripts/redact.js`, `scripts/redact.test.js` | The redaction rules and their tests (`npm test`) |
+| `scripts/update-vapi-tools.js` | Updates the tools and Jordan in Vapi from code (dry run by default; used for v8) |
 | `scripts/check-secrets.js` | Safety scan for keys, webhooks, emails and phone numbers |
 | [`CHANGELOG.md`](CHANGELOG.md) | Version history |
 
 Webhook URLs, emails, phone numbers, org IDs and credentials are replaced with
-placeholders like `<MAKE_WEBHOOK_URL>` before anything is committed.
+placeholders like `<MAKE_WEBHOOK_URL>` before anything is committed. The staff number
+the transfer tool dials becomes `<TRANSFER_PHONE>` wherever it appears.
+
+**Known Vapi issue:** publishing from the assistant editor can silently detach the
+structured outputs. After every publish I re-attach them and check the next review email
+isn't blank ([incident write-up](https://github.com/Mark-Naumann/call-analyzer)).
 
 ## Testing
 
@@ -117,8 +137,9 @@ See [`CHANGELOG.md`](CHANGELOG.md). Highlights:
 - **v5:** live next-bus lookup via the `get_next_bus` tool → transit-sim.
 - **v6–v7:** voice "Kai", one question per turn, careful phone-number read-back, custom vocabulary for Santa Fe names.
 - **v8:** trip planning (`plan_trip`) and next-bus lookups without a route number.
+- **v9–v10:** transfers to a person on request (`transfer_to_person`); remembers what the caller said; never asks which route; phone numbers read back as words, exactly 10 digits (fixes a real bug the call review found).
 
-## What I'd improve next
+## What I'd do next
 
 - **Real data:** point `get_next_bus` at a real GTFS-realtime feed (transit-sim is built for this swap).
 - **Direction-aware answers:** ask "which way are you headed?" so Jordan gives only the bus going the right way.
@@ -126,13 +147,25 @@ See [`CHANGELOG.md`](CHANGELOG.md). Highlights:
 - **Service alerts:** read detours and delays to callers before they ask.
 - **More evals:** Spanish next-bus lookups, unknown stops, and angry complaints, run automatically after every prompt change.
 - **Secure the tool:** have transit-sim verify a Vapi secret header so only Jordan can call it.
+- **Warm transfers:** pass a short summary to the staff member before connecting, so callers don't repeat themselves.
+- **Turn call reviews into evals:** every real mistake the reviewer finds (like the 11-digit read-back) becomes a new Vapi Eval.
 
 ## Setup (for developers)
 
 ```bash
 cp .env.example .env      # then paste your Vapi PRIVATE key into .env
 npm run export            # downloads + redacts the Vapi configs into vapi/ and prompt.md
+npm test                  # tests for the redaction rules
 npm run check             # safety scan before committing
 ```
 
 Needs Node.js 18+. No packages to install. `.env` is in `.gitignore` and is never committed.
+
+## Related projects
+
+| Repo | What it is |
+|---|---|
+| [transit-sim](https://github.com/Mark-Naumann/transit-sim) | The simulated bus system and API Jordan's tools call ([live map](https://transit-sim-sigma.vercel.app)) |
+| [painting-agent](https://github.com/Mark-Naumann/painting-agent) | Sam, my first voice agent (painting company receptionist) |
+| [call-analyzer](https://github.com/Mark-Naumann/call-analyzer) | The AI call quality review that grades every call, with real findings |
+| [call-analytics](https://github.com/Mark-Naumann/call-analytics) | Python + SQLite monitoring for both agents (quality, transfers, tool errors, dead air, cost) |

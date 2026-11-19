@@ -8,6 +8,8 @@
 //   2. Email addresses                                     -> <EMAIL>
 //   3. Vapi org ID (field "orgId", and its value anywhere) -> <ORG_ID>
 //   4. Phone numbers                                       -> <PHONE_NUMBER>
+//      ...but the number a Transfer Call tool dials        -> <TRANSFER_PHONE>
+//      (matched by its digits, so the same number written two ways still matches)
 //   5. Fields that hold keys, secrets, tokens, passwords
 //      or credentials, and every request header value     -> <REDACTED>
 // -----------------------------------------------------------------------------
@@ -23,8 +25,11 @@ const EMAIL = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
 // US-style phone numbers, with or without dashes, dots, spaces, ( ) or a +1 prefix
 const PHONE = /(?<![\w-])(\+?1[\s.-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}(?![\w-])/g;
 
+// Just the last 10 digits of a phone number (drops "+1", spaces, dashes and brackets)
+const last10Digits = (text) => String(text).replace(/\D/g, '').slice(-10);
+
 // Redact one piece of text. `log` collects what was found and where.
-function redactText(text, where, log, orgIds) {
+function redactText(text, where, log, orgIds, transferDigits) {
   let out = text;
   const replace = (pattern, label, rule) => {
     const matches = out.match(pattern);
@@ -35,7 +40,12 @@ function redactText(text, where, log, orgIds) {
   };
   replace(MAKE_WEBHOOK, '<MAKE_WEBHOOK_URL>', 'Make webhook URL');
   replace(EMAIL, '<EMAIL>', 'email address');
-  replace(PHONE, '<PHONE_NUMBER>', 'phone number');
+  // Phone numbers: the transfer tool's number gets its own label.
+  out = out.replace(PHONE, (match) => {
+    const isTransfer = transferDigits.has(last10Digits(match));
+    log.push({ where, rule: isTransfer ? 'transfer phone number' : 'phone number' });
+    return isTransfer ? '<TRANSFER_PHONE>' : '<PHONE_NUMBER>';
+  });
   for (const id of orgIds) {
     if (id && out.includes(id)) {
       log.push({ where, rule: 'org ID (inside text)', count: out.split(id).length - 1 });
@@ -50,9 +60,10 @@ function redactText(text, where, log, orgIds) {
 //   where  - a readable path like "model.messages[0].content", used in the log
 //   log    - list that collects every redaction
 //   orgIds - org ID values to hunt for inside text
-function redact(value, where, log, orgIds, insideHeaders = false) {
+//   transferDigits - the transfer tool's number(s), as 10 digits (see findTransferNumbers)
+function redact(value, where, log, orgIds, insideHeaders = false, transferDigits = new Set()) {
   if (Array.isArray(value)) {
-    return value.map((item, i) => redact(item, `${where}[${i}]`, log, orgIds, insideHeaders));
+    return value.map((item, i) => redact(item, `${where}[${i}]`, log, orgIds, insideHeaders, transferDigits));
   }
 
   if (value && typeof value === 'object') {
@@ -69,13 +80,13 @@ function redact(value, where, log, orgIds, insideHeaders = false) {
         log.push({ where: path, rule: insideHeaders ? 'request header' : 'key/credential field' });
       } else {
         // "headers" objects can carry auth tokens, so hide every value inside.
-        clean[key] = redact(child, path, log, orgIds, key.toLowerCase().endsWith('headers'));
+        clean[key] = redact(child, path, log, orgIds, key.toLowerCase().endsWith('headers'), transferDigits);
       }
     }
     return clean;
   }
 
-  if (typeof value === 'string') return redactText(value, where, log, orgIds);
+  if (typeof value === 'string') return redactText(value, where, log, orgIds, transferDigits);
   return value; // numbers, true/false, null are safe
 }
 
@@ -91,4 +102,19 @@ function findOrgIds(value, found = new Set()) {
   return found;
 }
 
-module.exports = { redact, findOrgIds, MAKE_WEBHOOK, EMAIL, PHONE };
+// Find the phone number(s) a Transfer Call tool dials (its "destinations"),
+// as 10 digits, so they can be labeled <TRANSFER_PHONE> wherever they appear.
+function findTransferNumbers(value, found = new Set()) {
+  if (Array.isArray(value)) value.forEach((v) => findTransferNumbers(v, found));
+  else if (value && typeof value === 'object') {
+    if (value.type === 'transferCall' && Array.isArray(value.destinations)) {
+      for (const destination of value.destinations) {
+        if (typeof destination.number === 'string') found.add(last10Digits(destination.number));
+      }
+    }
+    Object.values(value).forEach((child) => findTransferNumbers(child, found));
+  }
+  return found;
+}
+
+module.exports = { redact, findOrgIds, findTransferNumbers, MAKE_WEBHOOK, EMAIL, PHONE };

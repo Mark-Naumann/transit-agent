@@ -5,7 +5,8 @@
   "scripts": {
     "export": "node scripts/export-vapi.js",
     "check": "node scripts/check-secrets.js",
-    "update-tools": "node scripts/update-vapi-tools.js"
+    "update-tools": "node scripts/update-vapi-tools.js",
+    "test": "node --test scripts/*.test.js"
   },
   "license": "UNLICENSED"
 }
